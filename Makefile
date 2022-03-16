@@ -2,8 +2,6 @@ python_version := 3.10
 SHELL := /bin/bash
 VENV := .venv
 
-hello:
-	echo "Hello World!"
 
 init:
 	python${python_version} -m venv ${VENV}
