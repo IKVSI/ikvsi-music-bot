@@ -30,5 +30,5 @@ install: pip-install freeze
 format:
 	${black} src/*
 
-check-format:
+check:
 	${black} --check src/*
