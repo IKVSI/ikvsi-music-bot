@@ -4,6 +4,7 @@ python_version := 3.10
 python := ${VENV}/bin/python${python_version}
 pip := ${python} -m pip
 black := ${python} -m black
+yamllint := ${python} -m yamllint
 
 init:
 	python${python_version} -m venv ${VENV}
@@ -27,8 +28,16 @@ pip-install:
 
 install: pip-install freeze
 
-format:
+format-black:
 	${black} src/*
 
-check-format:
+check-black:
 	${black} --check src/*
+
+check-yamllint:
+	${yamllint} --strict ./
+
+
+format: format-black format-yamlfix
+
+check: check-yamllint check-black
