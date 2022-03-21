@@ -3,6 +3,7 @@ VENV := .venv
 python_version := 3.10
 python := ${VENV}/bin/python${python_version}
 pip := ${python} -m pip
+black := ${python} -m black
 
 init:
 	python${python_version} -m venv ${VENV}
@@ -25,3 +26,9 @@ pip-install:
 	${pip} install ${packet}
 
 install: pip-install freeze
+
+format:
+	${black} src/*
+
+check-format:
+	${black} --check src/*
