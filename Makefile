@@ -4,7 +4,7 @@ python_version := 3.10
 python := ${VENV}/bin/python${python_version}
 pip := ${python} -m pip
 black := ${python} -m black
-yamlfix := ${VENV}/bin/yamlfix
+yamllint := ${python} -m yamllint
 
 init:
 	python${python_version} -m venv ${VENV}
@@ -34,11 +34,10 @@ format-black:
 check-black:
 	${black} --check src/*
 
-format-yamlfix:
-	find ./ -type f -regextype posix-extended -regex ".*\.yml$$" | xargs ${yamlfix}
+check-yamllint:
+	${yamllint} --strict ./
 
 
 format: format-black format-yamlfix
 
-check: check-black format-yamlfix
-	git diff --exit-code
+check: check-yamllint check-black
