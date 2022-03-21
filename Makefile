@@ -41,4 +41,4 @@ format-yamlfix:
 format: format-black format-yamlfix
 
 check: check-black format-yamlfix
-	git diff
+	git diff --exit-code
