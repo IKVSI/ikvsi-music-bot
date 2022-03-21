@@ -1,8 +1,9 @@
+---
 name: Makefile CI
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
@@ -10,15 +11,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v3
-      with:
-        python-version: '3.10'
-        architecture: 'x64'
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+          architecture: x64
 
-    - name: Install dependencies
-      run: make init
-      
-    - name: Run check
-      run: make check
+      - name: Install dependencies
+        run: make init
 
+      - name: Run check
+        run: make check

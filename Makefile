@@ -4,6 +4,7 @@ python_version := 3.10
 python := ${VENV}/bin/python${python_version}
 pip := ${python} -m pip
 black := ${python} -m black
+yamlfix := ${VENV}/bin/yamlfix
 
 init:
 	python${python_version} -m venv ${VENV}
@@ -27,8 +28,17 @@ pip-install:
 
 install: pip-install freeze
 
-format:
+format-black:
 	${black} src/*
 
-check:
+check-black:
 	${black} --check src/*
+
+format-yamlfix:
+	find ./ -type f -regextype posix-extended -regex ".*\.yml$$" | xargs ${yamlfix}
+
+
+format: format-black format-yamlfix
+
+check: check-black format-yamlfix
+	git diff
