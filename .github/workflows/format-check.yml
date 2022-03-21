@@ -1,5 +1,5 @@
 ---
-name: Makefile CI
+name: Check files formatting
 
 on:  # yamllint disable-line rule:truthy
   pull_request:
