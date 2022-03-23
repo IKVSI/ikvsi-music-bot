@@ -14,6 +14,8 @@ init:
 clean:
 	rm -rf ${VENV}
 
+reinit: clean init
+
 freeze:
 	${pip} freeze > requiremets.txt
 
