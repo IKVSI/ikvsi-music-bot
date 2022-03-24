@@ -1,6 +1,5 @@
 from pydantic import BaseSettings
 from pydantic import SecretStr
-from aiogram import Dispatcher, Bot
 
 
 class TelegramSettings(BaseSettings):
