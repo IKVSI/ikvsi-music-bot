@@ -1,13 +1,18 @@
 import logging
-from bot import TelegramSettings
 from aiogram import executor
-from bot import CommandsController
+from bot import commands, TelegramSettings
+
+logging.log()
+
 
 def main():
     logging.basicConfig(level=logging.INFO)
     telegram_settings = TelegramSettings()
-    sc = CommandsController(telegram_settings)
-    executor.start_polling(sc.dispatcher)
+    bot, dispatcher = commands(telegram_settings)
+    for i in dispatcher.message_handlers.handlers:
+        print(i)
+    executor.start_polling(dispatcher)
+
 
 if __name__ == "__main__":
     main()
