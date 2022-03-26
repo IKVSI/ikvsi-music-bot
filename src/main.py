@@ -2,8 +2,6 @@ import logging
 from aiogram import executor
 from bot import commands, TelegramSettings
 
-logging.log()
-
 
 def main():
     logging.basicConfig(level=logging.INFO)
