@@ -1,5 +1,15 @@
+import logging
+from aiogram import executor
+from bot import commands, TelegramSettings
+
+
 def main():
-    print("Hello World!")
+    logging.basicConfig(level=logging.INFO)
+    telegram_settings = TelegramSettings()
+    bot, dispatcher = commands(telegram_settings)
+    for i in dispatcher.message_handlers.handlers:
+        print(i)
+    executor.start_polling(dispatcher)
 
 
 if __name__ == "__main__":

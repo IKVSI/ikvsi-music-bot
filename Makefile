@@ -14,6 +14,8 @@ init:
 clean:
 	rm -rf ${VENV}
 
+reinit: clean init
+
 freeze:
 	${pip} freeze > requiremets.txt
 
@@ -38,6 +40,6 @@ check-yamllint:
 	${yamllint} --strict ./
 
 
-format: format-black format-yamlfix
+format: format-black
 
 check: check-yamllint check-black
