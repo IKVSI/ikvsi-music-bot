@@ -1,5 +1,5 @@
 import logging
-from typing import Union, Callable
+from typing import Union
 from aiogram import Dispatcher, Bot, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters import StateFilter, Command
