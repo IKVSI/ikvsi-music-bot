@@ -18,4 +18,3 @@ services:
       PGADMIN_DEFAULT_PASSWORD: "${POSTGRES_PASSWORD}"
     ports:
       - "5050:80"
-
