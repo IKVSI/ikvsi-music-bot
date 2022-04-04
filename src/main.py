@@ -7,8 +7,6 @@ def main():
     logging.basicConfig(level=logging.INFO)
     telegram_settings = TelegramSettings()
     bot, dispatcher = commands(telegram_settings)
-    for i in dispatcher.message_handlers.handlers:
-        print(i)
     executor.start_polling(dispatcher)
 
 
