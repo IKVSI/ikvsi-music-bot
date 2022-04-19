@@ -46,7 +46,6 @@ check: check-yamllint check-black
 
 up:
 	docker-compose up --detach postgres
-	docker-compose up --detach pgadmin
 
 down:
-	docker-compose down postgres
+	docker-compose down

@@ -1,5 +1,5 @@
 import logging
-from typing import Union
+from typing import Tuple, Union
 from aiogram import Dispatcher, Bot, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters import StateFilter, Command
@@ -11,7 +11,7 @@ from .templates import Templates
 from .states import States
 
 
-def commands(telegram_settings: TelegramSettings) -> tuple[Bot, Dispatcher]:
+def commands(telegram_settings: TelegramSettings) -> Tuple[Bot, Dispatcher]:
     bot = Bot(token=telegram_settings.bot_token.get_secret_value())
     dispatcher = Dispatcher(bot, storage=MemoryStorage())
     for command in [OverstateCommands, AllCommands]:
