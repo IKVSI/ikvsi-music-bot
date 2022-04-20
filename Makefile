@@ -49,3 +49,6 @@ up:
 
 down:
 	docker-compose down
+
+start:
+	${python} src/main.py

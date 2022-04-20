@@ -7,13 +7,14 @@ class DataBaseSettings(BaseSettings):
     password: SecretStr
     host: SecretStr = "0.0.0.0"
     port: SecretStr = "5432"
+    url_pattern: str = "{driver}://{user}:{password}@{host}:{port}/{database}"
 
     class Config:
         env_prefix = "POSTGRES_"
 
     @property
     def url(self):
-        return "postgresql://{user}:{password}@{host}:{port}/{database}".format(
+        return "{driver}" + "://{user}:{password}@{host}:{port}/{database}".format(
             user=self.user.get_secret_value(),
             password=self.password.get_secret_value(),
             host=self.host.get_secret_value(),

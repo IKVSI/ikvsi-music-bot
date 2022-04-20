@@ -5,6 +5,9 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters import StateFilter, Command
 from aiogram.utils.helper import ListItem
 from aiogram.utils import markdown
+from sqlalchemy.ext.asyncio import create_async_engine
+
+from logs import get_logger
 
 from .settings import TelegramSettings
 from .templates import Templates
@@ -20,14 +23,17 @@ def commands(telegram_settings: TelegramSettings) -> Tuple[Bot, Dispatcher]:
 
 
 class Commands:
-    def __init__(self, state: Union[ListItem, str], dispatcher: Dispatcher):
+    def __init__(
+        self, state: Union[ListItem, str], dispatcher: Dispatcher, engine=create_async
+    ):
         self.state = state
         self.dispatcher = dispatcher
         self.handler = dispatcher.message_handler
         self.initCommands()
 
     def register(self, **kwargs):
-        logging.info(f"state={self.state} ")
+        logger = get_logger(self.register)
+        logger.info(f"Commands: {kwargs['commands']} for state: {self.state}")
         return self.handler(state=self.state, **kwargs)
 
     def initCommands(self):
@@ -41,7 +47,7 @@ class OverstateCommands(Commands):
     def initCommands(self):
         self.handler = self.dispatcher.message_handler
 
-        @self.register(commands=["start", "clear"])
+        @self.register(commands=["start"])
         async def start(message: types.Message):
             state = self.dispatcher.current_state(user=message.from_user.id)
             await state.set_state(States.INIT[0])

@@ -3,4 +3,4 @@ Telegram bot for add music files and create playlists
 
 
 # Export envs
-export $(grep -v '^#' .env | xargs)
+export $(grep -v '^#' dev.env | xargs)
