@@ -7,7 +7,6 @@ class DataBaseSettings(BaseSettings):
     password: SecretStr
     host: SecretStr = "0.0.0.0"
     port: SecretStr = "5432"
-    url_pattern: str = "{driver}://{user}:{password}@{host}:{port}/{database}"
 
     class Config:
         env_prefix = "POSTGRES_"

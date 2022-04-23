@@ -1,33 +1,43 @@
-import logging
 from typing import Tuple, Union
 from aiogram import Dispatcher, Bot, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters import StateFilter, Command
 from aiogram.utils.helper import ListItem
 from aiogram.utils import markdown
-from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine, AsyncSession
+from sqlalchemy.orm import sessionmaker
+from db import DataBaseSettings
+from db.base import Users, Lists
+from abc import ABC, abstractmethod
 
 from logs import get_logger
 
-from .settings import TelegramSettings
-from .templates import Templates
-from .states import States
+from . import TelegramSettings
+from . import Templates
+from . import States
 
 
-def commands(telegram_settings: TelegramSettings) -> Tuple[Bot, Dispatcher]:
+def commands(
+    telegram_settings: TelegramSettings, database_settings: DataBaseSettings
+) -> Tuple[Bot, Dispatcher]:
     bot = Bot(token=telegram_settings.bot_token.get_secret_value())
     dispatcher = Dispatcher(bot, storage=MemoryStorage())
+    engine = create_async_engine(
+        database_settings.url.format(driver="postgresql+asyncpg"), echo=True
+    )
     for command in [OverstateCommands, AllCommands]:
-        command(dispatcher=dispatcher)
+        command(dispatcher=dispatcher, engine=engine)
     return (bot, dispatcher)
 
 
-class Commands:
+class Commands(ABC):
     def __init__(
-        self, state: Union[ListItem, str], dispatcher: Dispatcher, engine=create_async
+        self, state: Union[ListItem, str], dispatcher: Dispatcher, engine: AsyncEngine
     ):
         self.state = state
         self.dispatcher = dispatcher
+        self.engine = engine
+        self.assync_session = sessionmaker(engine, class_=AsyncSession)
         self.handler = dispatcher.message_handler
         self.initCommands()
 
@@ -36,22 +46,53 @@ class Commands:
         logger.info(f"Commands: {kwargs['commands']} for state: {self.state}")
         return self.handler(state=self.state, **kwargs)
 
+    @abstractmethod
     def initCommands(self):
         pass
 
 
 class OverstateCommands(Commands):
-    def __init__(self, dispatcher):
-        super().__init__(state="*", dispatcher=dispatcher)
+    def __init__(self, **kwargs):
+        super().__init__(state="*", **kwargs)
 
     def initCommands(self):
         self.handler = self.dispatcher.message_handler
 
         @self.register(commands=["start"])
         async def start(message: types.Message):
-            state = self.dispatcher.current_state(user=message.from_user.id)
-            await state.set_state(States.INIT[0])
-            await message.answer(Templates.greeting)
+            context = self.dispatcher.current_state(user=message.from_user.id)
+            user = message.from_user
+            state = await context.get_state()
+            if (state is None) or (state == States.INIT[0]):
+                async with self.assync_session() as session:
+
+                    def sync(session):
+                        result: Users = (
+                            session.query(Users)
+                            .where(user.id == Users.user_id)
+                            .one_or_none()
+                        )
+                        if result:
+                            if result.user_name != user.username:
+                                result.user_name = user.username
+                            return Templates.greeting_for_old
+                        else:
+                            session.add(Users(user_id=user.id, user_name=user.username))
+                            session.commit()
+                            session.add(Lists(list_name="Library", user_id=user.id))
+                            return Templates.greeting
+
+                    answer = await session.run_sync(sync)
+                    await session.commit()
+            else:
+                answer = Templates.reset
+            await context.set_state(States.INIT[0])
+            await message.answer(
+                answer.format(
+                    user_name=user.username,
+                    bot_name=(await self.dispatcher.bot.get_me()).username,
+                )
+            )
 
         start.description = "Сброс бота в начальное состояние init"
 
@@ -74,7 +115,7 @@ class OverstateCommands(Commands):
                                 f"/{command}" for command in func_commands
                             ),
                             description=getattr(
-                                func, "description", "Хрен знает что делает"
+                                func, "description", "Хрен знает что делает :/"
                             ),
                         )
                     )
@@ -92,8 +133,8 @@ class OverstateCommands(Commands):
 
 
 class AllCommands(Commands):
-    def __init__(self, dispatcher):
-        super().__init__(state=States.all(), dispatcher=dispatcher)
+    def __init__(self, **kwargs):
+        super().__init__(state=States.all(), **kwargs)
 
     def initCommands(self):
         self.handler = self.dispatcher.message_handler
