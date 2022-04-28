@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 VENV := .venv
-python_version := 3.8
+python_version := 3.10
 python := ${VENV}/bin/python${python_version}
 pip := ${python} -m pip
 black := ${python} -m black
