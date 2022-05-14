@@ -1,6 +1,6 @@
 from logging.config import fileConfig
-from src.db.settings import DataBaseSettings
-from src.db import base
+from src.bot.db.settings import DataBaseSettings
+from src.bot.db import base
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 

@@ -1,8 +1,8 @@
-"""empty message
+"""Init_tables
 
-Revision ID: d3a79e4e5774
+Revision ID: 9b65b0abb84e
 Revises: 
-Create Date: 2022-04-21 18:06:41.864991
+Create Date: 2022-05-15 00:56:14.236519
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = "d3a79e4e5774"
+revision = "9b65b0abb84e"
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,8 +21,7 @@ def upgrade():
     op.create_table(
         "songs",
         sa.Column("song_id", sa.Integer(), nullable=False),
-        sa.Column("song_name", sa.String(), nullable=False),
-        sa.Column("artist", sa.String(), nullable=False),
+        sa.Column("title", sa.String(), nullable=False),
         sa.PrimaryKeyConstraint("song_id"),
     )
     op.create_table(
@@ -35,6 +34,12 @@ def upgrade():
         "lists",
         sa.Column("list_id", sa.Integer(), nullable=False),
         sa.Column("list_name", sa.String(), nullable=False),
+        sa.Column(
+            "list_type",
+            sa.Enum("default", "artist", "user", name="listenum"),
+            server_default="user",
+            nullable=True,
+        ),
         sa.Column("user_id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["user_id"],
