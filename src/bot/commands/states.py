@@ -10,5 +10,5 @@ class Music(StatesGroup):
     title = State()
     artist = State()
     new_artist = State()
-    list_artists = State()
+    chose_artists = State()
     finish = State()

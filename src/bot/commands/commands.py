@@ -1,10 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import Callable
 
-from aiogram import Dispatcher
+from aiogram import Dispatcher, types
 from pydantic import SecretStr
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncEngine
+from sqlalchemy.future import select
 from sqlalchemy.orm import sessionmaker
+
+from ..db import base
 from ..logs import get_logger
 from ..templates import Templates
 
@@ -67,9 +70,22 @@ class Commands(ABC):
 
 
 class ChooseCommands(Commands):
-    def __init__(self, **kwargs):
+    def __init__(self, statement, **kwargs):
+        self.step = 20
+        self.statement = statement
         super().__init__(**kwargs)
         self.initSpecialHandlers()
 
     def initSpecialHandlers(self):
         self.handler = Commands.dispatcher.message_handler
+
+        @self.register(commands=["next"])
+        async def next(message: types.Message):
+            async with Commands.async_session() as session:
+                session.execute(self.statement)
+
+        @self.register(commands=["prev", "previous"])
+        async def previous(message: types.Message):
+            pass
+
+
